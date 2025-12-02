@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+
+# Logs
+*.log
+logs/
+
+# Build
+build/
+dist/
+
+# Docker / volumes
+data/
+postgres_data/
+docker_data/
+*.tar
+
+# IDEs
+.vscode/
+.idea/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+*.env
+.env.*
