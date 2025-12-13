@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app.models.stock import Stock
-from app.schemas.stock_schema import StockCreate
+from app.schemas.stock_schema import StockCreate, StockUpdate, StockOut
 
 
 def create_stock(db: Session, stock_data: StockCreate):
