@@ -21,3 +21,5 @@ app.include_router(stock_router)
 @app.get("/")
 def root():
     return {"message": "API funcionando!"}
+
+# Iniciar o servidor com: uvicorn app.main:app --reload
