@@ -1,14 +1,21 @@
-from sqlalchemy import Column, Integer, String, Float
-from app.database import Base
+from app.database import DBBase
 
-class Stock(Base):
-    __tablename__ = 'stock'
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import BIGINT, String, Float, DateTime
+from sqlalchemy.sql import func
 
-    id = Column(Integer, primary_key= True, index=True)
-    product = Column(String(100), unique= True, nullable= False)
-    category = Column(String(50))
-    quantity = Column(Integer, nullable= False, default= 0)
-    buy = Column(Float, nullable= False, default= 0.0)
-    sell = Column(Float, nullable= False, default= 0.0)
+from typing import List, Optional
 
- 
+from app.models.user import User
+
+class Stock(DBBase):
+  __tablename__= "stock"
+
+  id: Mapped[int] = mapped_column(BIGINT, primary_key=True, index=True)
+  product: Mapped[str] = mapped_column(String(60), unique=True, nullable=True)
+  category: Mapped[str] = mapped_column(String(80))
+  quantity: Mapped[int] = mapped_column(nullable=True, default= 1)
+  product_price: Mapped[float] = mapped_column(Float, nullable=True)
+  product_buy: Mapped[Optional[float]]
+  create_at: Mapped[str] = mapped_column(DateTime(timezone=True),server_default=func.now())
+  create_by: Mapped["User"] = relationship("User")

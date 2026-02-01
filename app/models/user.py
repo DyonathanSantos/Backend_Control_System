@@ -1,10 +1,16 @@
-from sqlalchemy import Column, Integer, String
-from app.database import Base
+from app.database import DBBase
 
-class User(Base):
-    __tablename__ = 'users'
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import String, BIGINT, DateTime
+from sqlalchemy.sql import func
 
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String(50), unique=True, nullable=False)
-    hashed_password = Column(String(255), nullable=False)
-    role = Column(String(20), nullable=False, default='user')
+from typing import Optional
+
+class User(DBBase):
+  __tablename__ = "user"
+
+  id: Mapped[int] = mapped_column(primary_key=True, index=True)
+  username: Mapped[str] = mapped_column(String(70), unique=True, nullable=True)
+  fullname: Mapped[Optional[str]] = mapped_column(String(100), default= None)
+  phone: Mapped[Optional[int]] = mapped_column(BIGINT, default= 0000000)
+  create_at: Mapped[str] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=True)
