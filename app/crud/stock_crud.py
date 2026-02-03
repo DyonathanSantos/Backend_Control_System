@@ -4,21 +4,34 @@ from app.models.stock import Stock
 from app.schemas.stock_schema import StockCreate, StockUpdate, StockOut
 
 
-def create_stock(db: Session, stock_data: StockCreate):
-    existing = db.query(Stock).filter(Stock.product == stock_data.product).first()
-    if existing:
-        raise HTTPException(status_code=400, detail="Produto já existe.")
+def create_stock (db: Session, stock_data: StockCreate):
+
+# Verification if exist the product in table
+    try:
+        existing = db.query(Stock).filter(Stock.product == stock_data.product).first()
+    except HTTPException as e:   
+            if existing:
+                db.rollback()
+                raise HTTPException(status_code=400, detail="Produto já existe")
+            
+# Unpacking the pydantic(stock_data) validation and returned in dict with values of schema key for commit and add
     stock = Stock(**stock_data.model_dump())
     db.add(stock)
     db.commit()
     db.refresh(stock)
     return stock
 
-def get_stock_all(db: Session):
+
+# Function for see all product (info) in Stock table.
+def get_all_stock(db:Session):
     return db.query(Stock).all()
 
-def get_stock_by_id(stock_id: int, db: Session ):
-    return db.query(Stock).filter_by(id=stock_id).first()
+
+# Function for see product (info) by id.
+def get_stock_one(db:Session, stock_id: int):
+    return db.query(Stock).filter_by(id=stock_id).firts()
+
+
 
 def update_stock(db: Session, stock_id: int, stock_data: StockUpdate):
     """Atualiza um estoque existente.
