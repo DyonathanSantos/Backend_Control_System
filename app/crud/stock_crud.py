@@ -31,47 +31,39 @@ def get_all_stock(db:Session):
 def get_stock_one(db:Session, stock_id: int):
     return db.query(Stock).filter_by(id=stock_id).firts()
 
-
-
-def update_stock(db: Session, stock_id: int, stock_data: StockUpdate):
-    """Atualiza um estoque existente.
-
-    Comportamento:
-    - Busca o objeto no banco com `Session.get`.
-    - Se não existir, lança HTTPException(404).
-    - Aplica apenas os campos informados (suporta updates parciais via Pydantic `exclude_unset=True`).
-    - Faz commit/refresh com tratamento de exceção e rollback em caso de erro.
-    """
-    # Buscando pelo id — Session.get é mais direto e eficiente
-    stock = db.get(Stock, stock_id)
-
-    if not stock:
-        raise HTTPException(status_code=404, detail="Produto não encontrado")
-
-    # Suporta updates parciais: somente os campos informados no payload serão atualizados
+# function for Update parcial
+def update_stock_parcial (db: Session, stock_data:StockUpdate, stock_id: int):
+    
+    # Checking if the ID exist 
+    existing = db.get(Stock).filter_by(stock_id).first()
+    if not existing:
+        raise HTTPException(status_code= 404, detail="Produto não existe!")
+    
+    # Conversion to dict and verification of incorret values
     update_data = stock_data.model_dump(exclude_unset=True)
 
-    # Validações simples antes de aplicar
-    if 'quantity' in update_data and update_data['quantity'] < 0:
-        raise HTTPException(status_code=400, detail='Quantidade não pode ser negativa')
-    if 'buy' in update_data and update_data['buy'] <= 0:
-        raise HTTPException(status_code=400, detail='Preço de compra não pode ser negativo')
-    if 'sell' in update_data and update_data['sell'] <= 0:
-        raise HTTPException(status_code=400, detail='Preço de venda não pode ser negativo')
-
-    # Aplicar atualizações dinamicamente
-    for key, value in update_data.items():
-        if hasattr(stock, key):
-            setattr(stock, key, value)
-
+    if update_data["quantity"] < 0:
+        raise Exception ("Número incorreto na quantidade, precisa ser maior que zero")
+    if update_data["product_price"] < 0:
+        raise Exception ("Valor incorreto no preço!")
+    if update_data["product_buy"] < 0:
+        raise Exception ("Valor incorreto no preço de compra")
+    
+    #  A Loop to update new information in the datebase and, if an error occurs, perform a rollback
     try:
-        db.commit()
-        db.refresh(stock)
-        return stock
+
+        for field, value in update_data:
+            setattr (Stock, field, value)
+
+            db.add()
+            db.commit()
+            db.refresh(Stock)
     except Exception as e:
         db.rollback()
-        # Se for um erro de integridade (ex: unique constraint), retorna 400
-        raise HTTPException(status_code=400, detail=str(e))
+        return f"Ocorreu um erro na tentativa de atualizar o item de ID {stock_id}, erro {e}"
+
+    
+
 
 def delete_stock(stock_id: int, db: Session):
     stock = db.query(Stock).filter(Stock.id == stock_id).first()
