@@ -5,7 +5,7 @@ from sqlalchemy import Float, String, ForeignKey, BIGINT
 
 from typing import List
 
-from app.models.sales import Sales
+#from app.models.sales import Sales
 from app.models.stock import Stock
 
 class SaleItem(DBBase):

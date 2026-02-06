@@ -12,8 +12,8 @@ from app.models.stock import Stock
 #Assoction Table for Join
 bill_stock = Table(
   'bill_stock',DBBase.metadata,
-  Column("bill_id", ForeignKey("bill.id"), primary_key=True),
-  Column("product_id", ForeignKey("stock.id"), primary_key=True),
+  Column("bill_id", ForeignKey("bill.id"), primary_key=True, index=True),
+  Column("product_id", ForeignKey("stock.id"), primary_key=True, index=True), 
 )
 
 #Table of Bill

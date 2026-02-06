@@ -1,10 +1,12 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status, Depends
+from typing import Annotated
 from sqlalchemy.orm import Session
+from app.database import get_db
 from app.models.stock import Stock
 from app.schemas.stock_schema import StockCreate, StockUpdate, StockOut
 
 
-def create_stock (db: Session, stock_data: StockCreate):
+def create_stock (db: Annotated[Session, Depends(get_db)], stock_data: StockCreate):
 
 # Verification if exist the product in table
     try:
@@ -12,7 +14,7 @@ def create_stock (db: Session, stock_data: StockCreate):
     except HTTPException as e:   
             if existing:
                 db.rollback()
-                raise HTTPException(status_code=400, detail="Produto já existe")
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Produto já existe")
             
 # Unpacking the pydantic(stock_data) validation and returned in dict with values of schema key for commit and add
     stock = Stock(**stock_data.model_dump())
@@ -23,16 +25,16 @@ def create_stock (db: Session, stock_data: StockCreate):
 
 
 # Function for see all product (info) in Stock table.
-def get_all_stock(db:Session):
+def get_all_stock(db: Annotated[Session, Depends(get_db)]):
     return db.query(Stock).all()
 
 
 # Function for see product (info) by id.
-def get_stock_one(db:Session, stock_id: int):
+def get_stock_one(db: Annotated[Session, Depends(get_db)], stock_id: int):
     return db.query(Stock).filter_by(id=stock_id).firts()
 
 # function for Update parcial
-def update_stock_parcial (db: Session, stock_data:StockUpdate, stock_id: int):
+def update_stock_parcial (db: Annotated[Session, Depends(get_db)], stock_data:StockUpdate, stock_id: int):
     
     # Checking if the ID exist 
     existing = db.get(Stock).filter_by(stock_id).first()
@@ -58,6 +60,7 @@ def update_stock_parcial (db: Session, stock_data:StockUpdate, stock_id: int):
             db.add()
             db.commit()
             db.refresh(Stock)
+            return Stock
     except Exception as e:
         db.rollback()
         return f"Ocorreu um erro na tentativa de atualizar o item de ID {stock_id}, erro {e}"
@@ -65,12 +68,12 @@ def update_stock_parcial (db: Session, stock_data:StockUpdate, stock_id: int):
     
 
 
-def delete_stock(stock_id: int, db: Session):
-    stock = db.query(Stock).filter(Stock.id == stock_id).first()
+def delete_stock(stock_id: int, db: Annotated[Session, Depends(get_db)]):
+    stock = db.query(Stock).filter_by(Stock.id == stock_id).first()
 
     if not stock:
-        return False
+        return status.HTTP_404_NOT_FOUND
 
     db.delete(stock)
     db.commit()
-    return True
+    return status.HTTP_204_NO_CONTENT

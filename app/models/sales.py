@@ -6,7 +6,7 @@ from sqlalchemy.sql import func
 
 from typing import List
 
-from app.models.user import User
+#from app.models.user import User
 from app.models.itemsales import SaleItem
 
 class Sales(DBBase):
