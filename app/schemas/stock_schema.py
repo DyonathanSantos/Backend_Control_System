@@ -1,9 +1,9 @@
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
-
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional
 
-# -------- Base usado como referência
+
 class StockBase(BaseModel):
+    """Base schema for Stock"""
     product: str
     category: str
     quantity: int
@@ -11,13 +11,13 @@ class StockBase(BaseModel):
     product_buy: Optional[float] = None
 
 
-# -------- Criar novo item (tudo obrigatório)
 class StockCreate(StockBase):
+    """Schema for creating a new Stock item"""
     pass
 
 
-# -------- Atualizar item (tudo opcional)
 class StockUpdate(BaseModel):
+    """Schema for updating Stock item (all fields optional)"""
     product: Optional[str] = None
     category: Optional[str] = None
     quantity: Optional[int] = None
@@ -25,12 +25,12 @@ class StockUpdate(BaseModel):
     product_buy: Optional[float] = None
 
 
-# -------- Resposta
 class StockResponse(StockBase):
-    product: str
-    quantity: int
-    product_price: float
-    category: str
-    class Config:
-        orm_mode = True
-        from_attributes= True
+    """Schema for Stock response"""
+    id: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+# Legacy alias for backward compatibility
+StockOut = StockResponse
