@@ -1,18 +1,21 @@
 from typing import Annotated
+from sqlalchemy.orm import Session
 
-from app.database import Sessao_, get_db
-from schemas.bill_schema import BillCreate, BillOut, BillUpdate
-from models.bill import Bill, bill_stock
-
-
-from fastapi import HTTPException, Depends, status
+from app.database import get_db
+from app.schemas.bill_schema import BillCreate, BillOut, BillUpdate
+from app.models.bill import Bill
 
 
-def all_see_bill(db: Annotated[Sessao_, Depends(get_db)]):
+from fastapi import HTTPException, Depends, status, FastAPI
+
+app = FastAPI()
+
+
+def all_see_bill(db: Annotated[Session, Depends(get_db)]):
   return db.query(Bill).all()
 
 
-def create_bill(db: Annotated[Sessao_, Depends(get_db)], bill_data: BillCreate):
+def create_bill(db: Annotated[Session, Depends(get_db)], bill_data: BillCreate):
 
   existing = db.query(Bill).filter(Bill.id == bill_data.id).first()
 

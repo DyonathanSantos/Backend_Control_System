@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
+
 from typing import Optional
 
 # -------- Base usado como referência
@@ -25,7 +26,7 @@ class StockUpdate(BaseModel):
 
 
 # -------- Resposta
-class StockOut(StockBase):
+class StockResponse(StockBase):
     product: str
     quantity: int
     product_price: float
