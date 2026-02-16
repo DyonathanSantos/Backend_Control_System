@@ -15,12 +15,10 @@ class StockInfo(BaseModel):
 class BillItemBase(BaseModel):
     """Base schema for BillItem"""
     quantity: int
-    unit_price: float
 
 
 class BillItemCreate(BillItemBase):
     """Schema for creating a new BillItem"""
-    bill_id: int
     stock_id: int
 
 
@@ -29,6 +27,7 @@ class BillItemResponse(BillItemBase):
     id: int
     bill_id: int
     stock_id: int
+    unit_price: float
     created_at: datetime
     stock: StockInfo
 

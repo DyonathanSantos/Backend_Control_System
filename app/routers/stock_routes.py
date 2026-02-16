@@ -13,7 +13,7 @@ from app.crud.stock_crud import (
     delete_stock
 )
 
-router = APIRouter(prefix="/stocks", tags=["stocks"])
+router = APIRouter(prefix="/stocks", tags=["Stock"])
 
 
 @router.post("", response_model=StockResponse, status_code=status.HTTP_201_CREATED)

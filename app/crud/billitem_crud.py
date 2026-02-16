@@ -12,7 +12,7 @@ def create_bill_item(
     bill_id: int,
     stock_id: int,
     quantity: int,
-    unit_price: float
+    unit_price: float | None = None
 ) -> BillItem:
     """
     Create a new BillItem with validation and stock quantity reduction.
@@ -52,6 +52,10 @@ def create_bill_item(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Insufficient stock quantity. Available: {stock.quantity}, Requested: {quantity}"
         )
+
+    # Use stock price when unit_price not provided
+    if unit_price is None:
+        unit_price = stock.product_price if stock.product_price is not None else 0.0
 
     # Create BillItem
     bill_item = BillItem(

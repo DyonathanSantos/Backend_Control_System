@@ -1,269 +1,329 @@
-# Backend Control System - Project Structure
+# Project Structure - Backend_Control_System
+
+## Directory Layout
 
 ```
 Backend_Control_System/
-├── LICENSE
-├── README.md
-├── requirements.txt
-├── REFACTORING_SUMMARY.md           ← Complete refactoring documentation
-├── BILLITEM_INTEGRATION_GUIDE.md    ← Integration guide with examples
 │
-├── app/
-│   ├── __init__.py
-│   ├── config.py                    (unchanged)
-│   ├── database.py                  (unchanged)
-│   │
-│   ├── main.py                      ✅ UPDATED
-│   │   - Added bill and billitem routers
-│   │   - Improved documentation
-│   │   - Better app configuration
-│   │
-│   ├── models/
-│   │   ├── __init__.py
-│   │   ├── all_models.py            ✅ UPDATED
-│   │   │   - Added billitem import
-│   │   │
-│   │   ├── user.py                  (unchanged)
-│   │   │
-│   │   ├── bill.py                  ✅ UPDATED
-│   │   │   - Removed direct Stock relationship
-│   │   │   - Added items relationship to BillItem
-│   │   │   - Fixed imports and datetime
-│   │   │
-│   │   ├── stock.py                 ✅ UPDATED
-│   │   │   - Removed bill_id foreign key
-│   │   │   - Added bill_items relationship
-│   │   │   - Fixed field naming (create_at → created_at, create_by → created_by)
-│   │   │
-│   │   └── billitem.py              ✅ NEW
-│   │       - Primary key: id
-│   │       - Foreign keys: bill_id, stock_id
-│   │       - Fields: quantity, unit_price, created_at
-│   │       - Relationships: bill, stock
-│   │
-│   ├── schemas/
-│   │   ├── __init__.py
-│   │   │
-│   │   ├── stock_schema.py          ✅ UPDATED
-│   │   │   - Cleaned structure
-│   │   │   - ConfigDict usage
-│   │   │   - Added StockOut alias
-│   │   │
-│   │   ├── bill_schema.py           ✅ UPDATED
-│   │   │   - Simplified structure
-│   │   │   - Proper separation of schemas
-│   │   │   - Added BillOut alias
-│   │   │
-│   │   └── billitem_schema.py       ✅ NEW
-│   │       - StockInfo (nested)
-│   │       - BillItemBase
-│   │       - BillItemCreate
-│   │       - BillItemResponse (with nested Stock)
-│   │
-│   ├── crud/
-│   │   ├── __init__.py
-│   │   │
-│   │   ├── stock_crud.py            ✅ UPDATED
-│   │   │   - create_stock() - Creation with validation
-│   │   │   - get_all_stock() - List all items
-│   │   │   - get_stock_by_id() - Get by ID with error handling
-│   │   │   - update_stock_partial() - Partial update with validation
-│   │   │   - delete_stock() - Safe deletion
-│   │   │   - ✅ Fixed: .first() typos (.firts() → .first())
-│   │   │   - ✅ Fixed: db.get() incorrect usage
-│   │   │   - ✅ Fixed: update logic (setattr on instance)
-│   │   │   - ✅ Fixed: removed error-hiding try/except
-│   │   │
-│   │   ├── bill_crud.py             ✅ UPDATED
-│   │   │   - create_bill() - Creation with validation
-│   │   │   - get_all_bills() - List all bills
-│   │   │   - get_bill_by_id() - Get by ID with error handling
-│   │   │   - update_bill() - Partial update
-│   │   │   - delete_bill() - Safe deletion
-│   │   │   - ✅ Fixed: db.refrash() → db.refresh()
-│   │   │   - ✅ Fixed: customer_name filtering instead of id
-│   │   │   - ✅ Removed: unnecessary FastAPI app
-│   │   │
-│   │   └── billitem_crud.py         ✅ NEW
-│   │       - create_bill_item()
-│   │         • Validates bill exists
-│   │         • Validates stock exists
-│   │         • Validates sufficient quantity
-│   │         • Decreases stock quantity
-│   │         • Creates BillItem
-│   │         • Safe transaction handling
-│   │
-│   └── routers/
-│       ├── __pycache__/
-│       │
-│       ├── stock_routes.py          ✅ UPDATED
-│       │   - POST /stocks
-│       │   - GET /stocks
-│       │   - GET /stocks/{stock_id}
-│       │   - PATCH /stocks/{stock_id}
-│       │   - DELETE /stocks/{stock_id}
-│       │   - Uses CRUD functions
-│       │   - Proper error handling
-│       │
-│       ├── bill_router.py           ✅ UPDATED (now with routers)
-│       │   - POST /bills
-│       │   - GET /bills
-│       │   - GET /bills/{bill_id}
-│       │   - PUT /bills/{bill_id}
-│       │   - DELETE /bills/{bill_id}
-│       │
-│       └── billitem_router.py       ✅ NEW
-│           - POST /bills/{bill_id}/items
-│           - Creates BillItem with validation
-│           - Returns nested response
+├── 📄 Documentation
+│   ├── README.md
+│   ├── QUICKSTART.md
+│   ├── DEPLOYMENT.md
+│   └── PROJECT_STRUCTURE.md
 │
-└── __pycache__/
-
+├── 🐳 Docker & Production
+│   ├── Dockerfile
+│   └── docker-compose.yml
+│
+├── 🔧 Configuration
+│   ├── requirements.txt
+│   ├── .env
+│   └── .env.example
+│
+├── 📜 Other
+│   ├── LICENSE
+│   └── pre-push-check.sh
+│
+└── 💻 Application
+    └── app/
+        ├── __init__.py
+        ├── main.py                 # FastAPI application & routes setup
+        ├── config.py               # Configuration management
+        ├── database.py             # Database connection & session
+        │
+        ├── models/                 # SQLAlchemy ORM Models
+        │   ├── __init__.py
+        │   ├── all_models.py       # Import all models
+        │   ├── user.py             # User model
+        │   ├── bill.py             # Bill/Comanda model
+        │   ├── billitem.py         # Bill item model
+        │   ├── stock.py            # Stock/Product model
+        │   ├── itemsales.py        # Item sales model
+        │   └── sales.py            # Sales model
+        │
+        ├── schemas/                # Pydantic request/response models
+        │   ├── __init__.py
+        │   ├── stock_schema.py     # Stock validation schemas
+        │   ├── bill_schema.py      # Bill validation schemas
+        │   └── billitem_schema.py  # BillItem validation schemas
+        │
+        ├── crud/                   # CRUD operations (business logic)
+        │   ├── __init__.py
+        │   ├── stock_crud.py       # Stock CRUD functions
+        │   ├── bill_crud.py        # Bill CRUD functions
+        │   └── billitem_crud.py    # BillItem CRUD functions
+        │
+        └── routers/                # API endpoints (routes)
+            ├── __init__.py
+            ├── stock_routes.py     # Stock endpoints
+            ├── bill_router.py      # Bill endpoints
+            └── billitem_router.py  # BillItem endpoints
 ```
-
-## Key Changes Summary
-
-### New Files (4)
-
-```
-✅ app/models/billitem.py
-✅ app/schemas/billitem_schema.py
-✅ app/crud/billitem_crud.py
-✅ app/routers/billitem_router.py
-```
-
-### Updated Files (6)
-
-```
-✅ app/models/bill.py
-✅ app/models/stock.py
-✅ app/schemas/stock_schema.py
-✅ app/schemas/bill_schema.py
-✅ app/crud/stock_crud.py
-✅ app/crud/bill_crud.py
-```
-
-### Enhanced Files (2)
-
-```
-✅ app/main.py
-✅ app/routers/stock_routes.py
-✅ app/models/all_models.py
-```
-
-### Documentation (2)
-
-```
-✅ REFACTORING_SUMMARY.md
-✅ BILLITEM_INTEGRATION_GUIDE.md
-```
-
-## Architecture Quality
-
-✅ **Separation of Concerns**
-
-- Models separate from Schemas
-- Schemas separate from CRUD
-- CRUD separate from Routes
-- Routes delegate to CRUD
-
-✅ **Clean Code**
-
-- No magic numbers or strings
-- Explicit error handling
-- Clear variable names
-- Comprehensive documentation
-
-✅ **Best Practices**
-
-- Type hints throughout
-- Proper HTTP status codes
-- Dependency injection with Depends
-- Request/Response models
-- Validation at all layers
-
-✅ **Production Ready**
-
-- Error handling for all cases
-- Transaction safety
-- Proper database constraints
-- ORM relationship definitions
-- Complete API endpoints
-
-## Database Relationships
-
-```python
-# Bill has many BillItems
-bill.items: list[BillItem]
-
-# BillItem belongs to Bill
-bill_item.bill: Bill
-
-# BillItem references Stock
-bill_item.stock: Stock
-
-# Stock has many BillItems
-stock.bill_items: list[BillItem]
-```
-
-## API Routes Map
-
-```
-/stocks
-├── POST      (Create)
-├── GET       (List all)
-├── GET /{id} (Get one)
-├── PATCH /{id} (Update)
-└── DELETE /{id} (Delete)
-
-/bills
-├── POST      (Create)
-├── GET       (List all)
-├── GET /{id} (Get one)
-├── PUT /{id} (Update)
-└── DELETE /{id} (Delete)
-└── /{id}/items
-    └── POST  (Add item to bill)
-```
-
-## Data Flow
-
-```
-User Request
-    ↓
-FastAPI Router (validates HTTP)
-    ↓
-Pydantic Schema (validates data)
-    ↓
-CRUD Function (business logic)
-    ↓
-SQLAlchemy Model (database interaction)
-    ↓
-Database
-    ↓
-SQLAlchemy Model (retrieves)
-    ↓
-Pydantic Schema (serializes)
-    ↓
-FastAPI Router (HTTP response)
-    ↓
-User Response
-```
-
-## Status Summary
-
-✅ All models created and updated
-✅ All schemas created and updated
-✅ All CRUD functions created and refactored
-✅ All routers created and updated
-✅ All bugs fixed
-✅ Full type hints
-✅ Comprehensive documentation
-✅ Production ready code
-✅ Clean architecture
 
 ---
 
-**Refactoring Status:** COMPLETE ✅
-**Code Quality:** PRODUCTION READY ✅
-**Documentation:** COMPREHENSIVE ✅
+## Module Descriptions
+
+### 🔵 Core Application
+
+#### `main.py`
+
+- FastAPI application initialization
+- Router registration with API versioning (`/api/v1/`)
+- Logging configuration
+- CORS middleware setup
+- Global exception handlers
+- Health check endpoints
+
+#### `config.py`
+
+- Environment variable management
+- Application settings
+- Database configuration
+- CORS origins configuration
+
+#### `database.py`
+
+- SQLAlchemy engine setup
+- Database session management
+- ORM base class definition
+
+---
+
+### 🔴 Models (`models/`)
+
+Data layer - SQLAlchemy ORM models
+
+#### `bill.py`
+
+- Bill/Comanda entity
+- Fields: id, table_number, customer_name, created_at, status
+- Relationships: items (BillItem), sales (Sales)
+
+#### `billitem.py`
+
+- Bill item entity (join table between Bill and Stock)
+- Fields: id, bill_id, stock_id, quantity, unit_price, created_at
+- Relationships: bill, stock
+
+#### `stock.py`
+
+- Product/Stock entity
+- Fields: id, name, quantity, price, created_at, created_by
+- Relationships: bill_items (BillItem), sales (Sales)
+
+#### `user.py`
+
+- User entity
+- Fields: id, username, email, password (hashed)
+
+#### `sales.py` & `itemsales.py`
+
+- Sales tracking entities
+- Track sales history and item sales
+
+#### `all_models.py`
+
+- Central import file for all models
+- Ensures all models are registered with SQLAlchemy
+
+---
+
+### 🟢 Schemas (`schemas/`)
+
+Validation layer - Pydantic models for request/response validation
+
+#### `stock_schema.py`
+
+- `StockBase` - Base fields for stock
+- `StockCreate` - Input validation for creation
+- `StockUpdate` - Input validation for updates
+- `StockResponse` - Output response model
+
+#### `bill_schema.py`
+
+- `BillBase` - Base fields for bill
+- `BillCreate` - Input validation for creation
+- `BillUpdate` - Input validation for updates
+- `BillResponse` - Output response model with nested items
+
+#### `billitem_schema.py`
+
+- `BillItemBase` - Base fields for bill item
+- `BillItemCreate` - Input validation for creation
+- `BillItemResponse` - Output with nested stock info
+- `StockInfo` - Nested stock information in response
+
+---
+
+### 🟡 CRUD (`crud/`)
+
+Business logic layer - Database operations
+
+#### `stock_crud.py`
+
+- `create_stock()` - Create new stock item
+- `get_all_stock()` - List all stock items with pagination
+- `get_stock_by_id()` - Get single stock item
+- `update_stock_partial()` - Update specific fields
+- `delete_stock()` - Delete stock item
+
+#### `bill_crud.py`
+
+- `create_bill()` - Create new bill/comanda
+- `get_all_bills()` - List all bills
+- `get_bill_by_id()` - Get single bill with items
+- `update_bill()` - Update bill details
+- `delete_bill()` - Delete bill
+
+#### `billitem_crud.py`
+
+- `create_bill_item()` - Add item to bill with inventory validation
+- Validates: bill exists, stock exists, sufficient quantity
+- Decreases stock quantity automatically
+
+---
+
+### 🟣 Routers (`routers/`)
+
+API endpoint layer - HTTP request handling
+
+#### `stock_routes.py`
+
+```
+POST   /api/v1/stock/           - Create stock item
+GET    /api/v1/stock/           - List all stock items
+GET    /api/v1/stock/{id}       - Get specific stock
+PUT    /api/v1/stock/{id}       - Update stock
+DELETE /api/v1/stock/{id}       - Delete stock
+```
+
+#### `bill_router.py`
+
+```
+POST   /api/v1/bills/           - Create bill
+GET    /api/v1/bills/           - List all bills
+GET    /api/v1/bills/{id}       - Get specific bill
+PUT    /api/v1/bills/{id}       - Update bill
+DELETE /api/v1/bills/{id}       - Delete bill
+```
+
+#### `billitem_router.py`
+
+```
+POST   /api/v1/billitems/       - Add item to bill
+GET    /api/v1/billitems/       - List all bill items
+PUT    /api/v1/billitems/{id}   - Update bill item
+DELETE /api/v1/billitems/{id}   - Delete bill item
+```
+
+---
+
+## Data Flow Architecture
+
+```
+HTTP Request
+    ↓
+Router (@app.get, @app.post, etc)
+    ↓
+Schema Validation (Pydantic)
+    ↓
+CRUD Function (Business Logic)
+    ↓
+SQLAlchemy Model (ORM)
+    ↓
+Database
+    ↓
+SQLAlchemy Model (Query Result)
+    ↓
+Schema Serialization (Pydantic)
+    ↓
+HTTP Response
+```
+
+---
+
+## Database Relationships
+
+### Bill ↔ BillItem
+
+- One Bill has many BillItems
+- BillItem belongs to one Bill
+
+### Stock ↔ BillItem
+
+- One Stock has many BillItems
+- BillItem references one Stock (inventory tracking)
+
+### Bill ↔ Sales
+
+- One Bill has many Sales
+- Sales belong to one Bill
+
+### Stock ↔ Sales
+
+- One Stock has many Sales
+- Sales reference one Stock
+
+---
+
+## API Endpoints Summary
+
+| Method | Endpoint                 | Purpose           |
+| ------ | ------------------------ | ----------------- |
+| POST   | `/api/v1/stock/`         | Create stock item |
+| GET    | `/api/v1/stock/`         | List stock items  |
+| GET    | `/api/v1/stock/{id}`     | Get stock details |
+| PUT    | `/api/v1/stock/{id}`     | Update stock      |
+| DELETE | `/api/v1/stock/{id}`     | Delete stock      |
+| POST   | `/api/v1/bills/`         | Create bill       |
+| GET    | `/api/v1/bills/`         | List bills        |
+| GET    | `/api/v1/bills/{id}`     | Get bill details  |
+| PUT    | `/api/v1/bills/{id}`     | Update bill       |
+| DELETE | `/api/v1/bills/{id}`     | Delete bill       |
+| POST   | `/api/v1/billitems/`     | Add item to bill  |
+| GET    | `/api/v1/billitems/`     | List bill items   |
+| PUT    | `/api/v1/billitems/{id}` | Update bill item  |
+| DELETE | `/api/v1/billitems/{id}` | Delete bill item  |
+
+---
+
+## Documentation Endpoints
+
+- **Swagger UI** - `GET /docs`
+- **ReDoc** - `GET /redoc`
+- **Health Check** - `GET /`
+- **Detailed Health** - `GET /api/v1/health`
+
+---
+
+## Architecture Principles
+
+✅ **Separation of Concerns**
+
+- Models handle data structure
+- Schemas handle validation
+- CRUD handles business logic
+- Routers handle HTTP layer
+
+✅ **Clean Code**
+
+- Type hints on all functions
+- Descriptive variable names
+- Clear error handling
+- Well-organized imports
+
+✅ **Best Practices**
+
+- DRY (Don't Repeat Yourself)
+- SOLID principles
+- RESTful API design
+- Proper HTTP status codes
+
+✅ **Production Ready**
+
+- Input validation at all layers
+- Error handling and logging
+- Database transaction safety
+- CORS security
+- Environment-based configuration

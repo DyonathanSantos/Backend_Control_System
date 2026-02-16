@@ -13,7 +13,7 @@ from app.crud.bill_crud import (
     delete_bill
 )
 
-router = APIRouter(prefix="/bills", tags=["bills"])
+router = APIRouter(prefix="/bills", tags=["Bills"])
 
 
 @router.post("", response_model=BillResponse, status_code=status.HTTP_201_CREATED)

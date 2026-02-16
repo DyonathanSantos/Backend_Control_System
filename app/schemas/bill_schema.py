@@ -2,6 +2,8 @@ from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 
+from app.schemas.billitem_schema import BillItemResponse
+
 
 class BillBase(BaseModel):
     """Base schema for Bill"""
@@ -20,10 +22,11 @@ class BillUpdate(BaseModel):
 
 
 class BillResponse(BillBase):
-    """Schema for Bill response"""
+    """Schema for Bill response including nested items"""
     id: int
     status: str
     created_at: datetime
+    items: List[BillItemResponse] = []
 
     model_config = ConfigDict(from_attributes=True)
 
